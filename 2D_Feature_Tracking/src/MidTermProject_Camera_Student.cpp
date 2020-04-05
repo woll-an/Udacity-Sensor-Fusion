@@ -101,9 +101,14 @@ int main(int argc, const char* argv[]) {
     bool bFocusOnVehicle = true;
     cv::Rect vehicleRect(535, 180, 180, 150);
     if (bFocusOnVehicle) {
-      // ...
+      vector<cv::KeyPoint> vehicleKeypoints;
+      for (auto& kp : keypoints) {
+        if (vehicleRect.contains(kp.pt)) {
+          vehicleKeypoints.push_back(kp);
+        }
+      }
+      keypoints = std::move(vehicleKeypoints);
     }
-
     //// EOF STUDENT ASSIGNMENT
 
     // optional : limit number of keypoints (helpful for debugging and learning)
