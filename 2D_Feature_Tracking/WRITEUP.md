@@ -1,0 +1,2 @@
+# Best detector/decriptor combination
+As we want to run our feature detecton on a car with real time constraints, we aim for the detector/decriptor combination with the shortest computing time which detects a good amount of keypoints on the car in front of us. The best detector is therefore FAST, which gets the best result combined either with BRIEF, BRISK or ORB descriptor.
