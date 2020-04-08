@@ -165,7 +165,46 @@ void computeTTCCamera(std::vector<cv::KeyPoint>& kptsPrev,
                       double frameRate,
                       double& TTC,
                       cv::Mat* visImg) {
-  // ...
+  // stores the distance ratios for all keypoints between curr. and prev. frame
+  vector<double> distRatios;
+  for (auto it1 = kptMatches.begin(); it1 != kptMatches.end() - 1; ++it1) {
+    // get current keypoint and its matched partner in the prev. frame
+    cv::KeyPoint kpOuterCurr = kptsCurr.at(it1->trainIdx);
+    cv::KeyPoint kpOuterPrev = kptsPrev.at(it1->queryIdx);
+
+    for (auto it2 = kptMatches.begin() + 1; it2 != kptMatches.end(); ++it2) {
+      double minDist = 100.0;  // min. required distance
+
+      // get next keypoint and its matched partner in the prev. frame
+      cv::KeyPoint kpInnerCurr = kptsCurr.at(it2->trainIdx);
+      cv::KeyPoint kpInnerPrev = kptsPrev.at(it2->queryIdx);
+
+      // compute distances and distance ratios
+      double distCurr = cv::norm(kpOuterCurr.pt - kpInnerCurr.pt);
+      double distPrev = cv::norm(kpOuterPrev.pt - kpInnerPrev.pt);
+
+      if (distPrev > std::numeric_limits<double>::epsilon() &&
+          distCurr >= minDist) {
+        double distRatio = distCurr / distPrev;
+        distRatios.push_back(distRatio);
+      }
+    }
+  }
+
+  // only continue if list of distance ratios is not empty
+  if (distRatios.size() == 0) {
+    TTC = NAN;
+    return;
+  }
+
+  std::sort(distRatios.begin(), distRatios.end());
+  int n = distRatios.size();
+  double medianDistRatio =
+      n % 2 == 1 ? distRatios[n / 2]
+                 : ((distRatios[n / 2] + distRatios[(n - 1) / 2]) / 2);
+
+  double delta_t = 1.0 / frameRate;
+  TTC = -delta_t / (1 - medianDistRatio);
 }
 
 double medianX(std::vector<LidarPoint>& lidarPoints) {
@@ -183,7 +222,7 @@ void computeTTCLidar(std::vector<LidarPoint>& lidarPointsPrev,
   double d0 = medianX(lidarPointsPrev);
   double d1 = medianX(lidarPointsCurr);
   double delta_t = (1.0 / frameRate);
-  TTC = d1 * delta_t / (d0 - d1);
+  TTC = delta_t * d1 / (d0 - d1);
 }
 
 set<int> findMatchingBoxes(vector<BoundingBox> boxes, cv::KeyPoint keypoint) {
