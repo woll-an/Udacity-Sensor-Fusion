@@ -4,6 +4,8 @@
 #include <numeric>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <set>
+#include <unordered_map>
 
 #include "camFusion.hpp"
 #include "dataStructures.h"
@@ -169,9 +171,42 @@ void computeTTCLidar(std::vector<LidarPoint>& lidarPointsPrev,
   // ...
 }
 
+set<int> findMatchingBoxes(vector<BoundingBox> boxes, cv::KeyPoint keypoint) {
+  set<int> matchingBoxes;
+  for (auto& box : boxes) {
+    if (box.roi.contains(keypoint.pt)) {
+      matchingBoxes.insert(box.boxID);
+    }
+  }
+  return matchingBoxes;
+}
+
 void matchBoundingBoxes(std::vector<cv::DMatch>& matches,
                         std::map<int, int>& bbBestMatches,
                         DataFrame& prevFrame,
                         DataFrame& currFrame) {
-  // ...
+  // loop over keypoint matches
+  auto prevBoxes = prevFrame.boundingBoxes;
+  auto currBoxes = currFrame.boundingBoxes;
+
+  unordered_map<int, unordered_map<int, int>> matchCandidates;
+
+  for (auto& match : matches) {
+    cv::KeyPoint prevKeypoint = prevFrame.keypoints[match.queryIdx];
+    cv::KeyPoint currKeypoint = currFrame.keypoints[match.trainIdx];
+
+    auto prevSet = findMatchingBoxes(prevBoxes, prevKeypoint);
+    auto currSet = findMatchingBoxes(currBoxes, currKeypoint);
+
+    for (auto& currID : currSet) {
+      for (auto& prevID : prevSet) {
+        int currentCount = matchCandidates[currID][prevID]++;
+        int bestCandidate = bbBestMatches[currID];
+        int bestCount = matchCandidates[currID][bestCandidate];
+        if (bestCount < currentCount) {
+          bbBestMatches[currID] = prevID;
+        }
+      }
+    }
+  }
 }

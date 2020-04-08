@@ -188,10 +188,6 @@ int main(int argc, const char* argv[]) {
 
     cout << "#4 : CLUSTER LIDAR POINT CLOUD done" << endl;
 
-    // REMOVE THIS LINE BEFORE PROCEEDING WITH THE FINAL PROJECT
-    continue;  // skips directly to the next image without processing what comes
-               // beneath
-
     /* DETECT IMAGE KEYPOINTS */
 
     // convert current image to grayscale
@@ -242,9 +238,8 @@ int main(int argc, const char* argv[]) {
 
     cout << "#6 : EXTRACT DESCRIPTORS done" << endl;
 
-    if (dataBuffer.size() >
-        1)  // wait until at least two images have been processed
-    {
+    // wait until at least two images have been processed
+    if (dataBuffer.size() > 1) {
       /* MATCH KEYPOINT DESCRIPTORS */
 
       vector<cv::DMatch> matches;
