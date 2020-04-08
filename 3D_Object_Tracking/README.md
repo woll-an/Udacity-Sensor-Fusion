@@ -13,6 +13,8 @@ I compute the medians of the Lidar Points in X direction for the current (``d1``
 
 ## FP.3 Associate Keypoint Correspondences with Bounding Boxes
 
+I loop through all matches and add those to the boxes keypoint matches, where the current keypoint is inside the bounding box.
+
 ## FP.4 Compute Camera-based TTC
 
 ## FP.5 Performance Evaluation 1

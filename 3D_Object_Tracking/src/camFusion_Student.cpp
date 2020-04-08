@@ -150,7 +150,11 @@ void clusterKptMatchesWithROI(BoundingBox& boundingBox,
                               std::vector<cv::KeyPoint>& kptsPrev,
                               std::vector<cv::KeyPoint>& kptsCurr,
                               std::vector<cv::DMatch>& kptMatches) {
-  // ...
+  for (auto& match : kptMatches) {
+    if (boundingBox.roi.contains(kptsCurr[match.trainIdx].pt)) {
+      boundingBox.kptMatches.push_back(match);
+    }
+  }
 }
 
 // Compute time-to-collision (TTC) based on keypoint correspondences in
