@@ -26,6 +26,11 @@ using namespace std;
 int main(int argc, const char* argv[]) {
   /* INIT VARIABLES AND DATA STRUCTURES */
 
+  if (argc < 3) {
+    cout << "Usage : " << argv[0] << " detectorType descriptorType" << endl;
+    return 1;
+  }
+
   // data location
   string dataPath = "../";
 
@@ -182,7 +187,7 @@ int main(int argc, const char* argv[]) {
     bVis = true;
     if (bVis) {
       show3DObjects((dataBuffer.end() - 1)->boundingBoxes, cv::Size(4.0, 20.0),
-                    cv::Size(2000, 2000), true);
+                    cv::Size(2000, 2000), false);
     }
     bVis = false;
 
@@ -198,12 +203,14 @@ int main(int argc, const char* argv[]) {
     // extract 2D keypoints from current image
     vector<cv::KeyPoint>
         keypoints;  // create empty feature list for current image
-    string detectorType = "SHITOMASI";
+    string detectorType = argv[1];
 
     if (detectorType.compare("SHITOMASI") == 0) {
       detKeypointsShiTomasi(keypoints, imgGray, false);
+    } else if (detectorType.compare("HARRIS") == 0) {
+      detKeypointsHarris(keypoints, imgGray, false);
     } else {
-      //...
+      detKeypointsModern(keypoints, imgGray, detectorType, false);
     }
 
     // optional : limit number of keypoints (helpful for debugging and learning)
@@ -228,7 +235,7 @@ int main(int argc, const char* argv[]) {
     /* EXTRACT KEYPOINT DESCRIPTORS */
 
     cv::Mat descriptors;
-    string descriptorType = "BRISK";  // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+    string descriptorType = argv[2];  // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
     descKeypoints((dataBuffer.end() - 1)->keypoints,
                   (dataBuffer.end() - 1)->cameraImg, descriptors,
                   descriptorType);
@@ -243,15 +250,17 @@ int main(int argc, const char* argv[]) {
       /* MATCH KEYPOINT DESCRIPTORS */
 
       vector<cv::DMatch> matches;
-      string matcherType = "MAT_BF";         // MAT_BF, MAT_FLANN
-      string descriptorType = "DES_BINARY";  // DES_BINARY, DES_HOG
-      string selectorType = "SEL_NN";        // SEL_NN, SEL_KNN
+      string matcherType = "MAT_BF";  // MAT_BF, MAT_FLANN
+      string descriptorTypeM = (descriptorType.compare("SIFT") == 0)
+                                   ? "DES_HOG"
+                                   : "DES_BINARY";  // DES_BINARY, DES_HOG
+      string selectorType = "SEL_NN";               // SEL_NN, SEL_KNN
 
       matchDescriptors((dataBuffer.end() - 2)->keypoints,
                        (dataBuffer.end() - 1)->keypoints,
                        (dataBuffer.end() - 2)->descriptors,
                        (dataBuffer.end() - 1)->descriptors, matches,
-                       descriptorType, matcherType, selectorType);
+                       descriptorTypeM, matcherType, selectorType);
 
       // store matches in current data frame
       (dataBuffer.end() - 1)->kptMatches = matches;
