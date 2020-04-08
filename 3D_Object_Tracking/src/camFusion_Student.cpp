@@ -164,11 +164,22 @@ void computeTTCCamera(std::vector<cv::KeyPoint>& kptsPrev,
   // ...
 }
 
+double medianX(std::vector<LidarPoint>& lidarPoints) {
+  sort(lidarPoints.begin(), lidarPoints.end(),
+       [](LidarPoint a, LidarPoint b) { return a.x < b.x; });
+  int n = lidarPoints.size();
+  return n % 2 == 1 ? lidarPoints[n / 2].x
+                    : (lidarPoints[n / 2].x + lidarPoints[(n - 1) / 2].x) / 2;
+}
+
 void computeTTCLidar(std::vector<LidarPoint>& lidarPointsPrev,
                      std::vector<LidarPoint>& lidarPointsCurr,
                      double frameRate,
                      double& TTC) {
-  // ...
+  double d0 = medianX(lidarPointsPrev);
+  double d1 = medianX(lidarPointsCurr);
+  double delta_t = (1.0 / frameRate);
+  TTC = d1 * delta_t / (d0 - d1);
 }
 
 set<int> findMatchingBoxes(vector<BoundingBox> boxes, cv::KeyPoint keypoint) {

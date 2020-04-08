@@ -9,6 +9,8 @@
 
 ## FP.2 Compute Lidar-based TTC
 
+I compute the medians of the Lidar Points in X direction for the current (``d1``) and previous frame (``d0``). The time to collision with the constant velocity model can then be computed with ``TTC = d1 * delta_t / (d0 - d1)`` where delta_t is ``1/frame_rate``.
+
 ## FP.3 Associate Keypoint Correspondences with Bounding Boxes
 
 ## FP.4 Compute Camera-based TTC
