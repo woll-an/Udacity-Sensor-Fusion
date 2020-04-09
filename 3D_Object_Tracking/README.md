@@ -1,5 +1,9 @@
 # 3D Object Tracking
 
+## Usage
+
+after building the binary with ``mkdir build && cd build``, ``cmake ..`` and ``make``, use ``./3D_object_tracking <detectorType> <decriptorType>``
+
 ## FP.1 Match 3D Objects
 
 I implemented the following algorithm:
