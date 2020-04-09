@@ -143,8 +143,6 @@ int main(int argc, const char* argv[]) {
     frame.cameraImg = img;
     dataBuffer.push_back(frame);
 
-    cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
-
     /* DETECT & CLASSIFY OBJECTS */
 
     float confThreshold = 0.2;
@@ -153,8 +151,6 @@ int main(int argc, const char* argv[]) {
                   (dataBuffer.end() - 1)->boundingBoxes, confThreshold,
                   nmsThreshold, yoloBasePath, yoloClassesFile,
                   yoloModelConfiguration, yoloModelWeights, bVis);
-
-    cout << "#2 : DETECT & CLASSIFY OBJECTS done" << endl;
 
     /* CROP LIDAR POINTS */
 
@@ -170,8 +166,6 @@ int main(int argc, const char* argv[]) {
     cropLidarPoints(lidarPoints, minX, maxX, maxY, minZ, maxZ, minR);
 
     (dataBuffer.end() - 1)->lidarPoints = lidarPoints;
-
-    cout << "#3 : CROP LIDAR POINTS done" << endl;
 
     /* CLUSTER LIDAR POINT CLOUD */
 
@@ -190,8 +184,6 @@ int main(int argc, const char* argv[]) {
                     cv::Size(2000, 2000), false);
     }
     bVis = false;
-
-    cout << "#4 : CLUSTER LIDAR POINT CLOUD done" << endl;
 
     /* DETECT IMAGE KEYPOINTS */
 
@@ -230,8 +222,6 @@ int main(int argc, const char* argv[]) {
     // push keypoints and descriptor for current frame to end of data buffer
     (dataBuffer.end() - 1)->keypoints = keypoints;
 
-    cout << "#5 : DETECT KEYPOINTS done" << endl;
-
     /* EXTRACT KEYPOINT DESCRIPTORS */
 
     cv::Mat descriptors;
@@ -243,8 +233,6 @@ int main(int argc, const char* argv[]) {
     // push descriptors for current frame to end of data buffer
     (dataBuffer.end() - 1)->descriptors = descriptors;
 
-    cout << "#6 : EXTRACT DESCRIPTORS done" << endl;
-
     // wait until at least two images have been processed
     if (dataBuffer.size() > 1) {
       /* MATCH KEYPOINT DESCRIPTORS */
@@ -254,7 +242,7 @@ int main(int argc, const char* argv[]) {
       string descriptorTypeM = (descriptorType.compare("SIFT") == 0)
                                    ? "DES_HOG"
                                    : "DES_BINARY";  // DES_BINARY, DES_HOG
-      string selectorType = "SEL_NN";               // SEL_NN, SEL_KNN
+      string selectorType = "SEL_KNN";              // SEL_NN, SEL_KNN
 
       matchDescriptors((dataBuffer.end() - 2)->keypoints,
                        (dataBuffer.end() - 1)->keypoints,
@@ -264,8 +252,6 @@ int main(int argc, const char* argv[]) {
 
       // store matches in current data frame
       (dataBuffer.end() - 1)->kptMatches = matches;
-
-      cout << "#7 : MATCH KEYPOINT DESCRIPTORS done" << endl;
 
       /* TRACK 3D OBJECT BOUNDING BOXES */
 
@@ -281,8 +267,6 @@ int main(int argc, const char* argv[]) {
 
       // store matches in current data frame
       (dataBuffer.end() - 1)->bbMatches = bbBestMatches;
-
-      cout << "#8 : TRACK 3D OBJECT BOUNDING BOXES done" << endl;
 
       /* COMPUTE TTC ON OBJECT IN FRONT */
 

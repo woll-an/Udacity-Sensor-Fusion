@@ -212,7 +212,7 @@ double medianX(std::vector<LidarPoint>& lidarPoints) {
        [](LidarPoint a, LidarPoint b) { return a.x < b.x; });
   int n = lidarPoints.size();
   return n % 2 == 1 ? lidarPoints[n / 2].x
-                    : (lidarPoints[n / 2].x + lidarPoints[(n - 1) / 2].x) / 2;
+                    : ((lidarPoints[n / 2].x + lidarPoints[(n - 1) / 2].x) / 2);
 }
 
 void computeTTCLidar(std::vector<LidarPoint>& lidarPointsPrev,
