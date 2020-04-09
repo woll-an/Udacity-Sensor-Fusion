@@ -27,11 +27,11 @@ I used implementation from the previous lecture about TTC. Compute for all keypo
 
 ## FP.5 Performance Evaluation 1
 
-I try to avoid the influence of outliers by using the median for the X value of the lidarPoints in the current and previous frame. Nevertheless, sometimes the Lidar-based TTC is a little bit off. As the points of the lidar do not measure the distance to the exact same points on the vehicle in two concurrent frames, the computation might be influenced by variations in the depth in x direction of the car in front.
+I try to avoid the influence of outliers by using the median for the X value of the lidarPoints in the current and previous frame. Such outliers are for example visible in frames 6 and 9. This is especially relevant, if the outlier has a lower x value than most of the other values, as this one is considered for the computation of the TTC. Nevertheless, sometimes the Lidar-based TTC is a little bit off. As the points of the lidar do not measure the distance to the exact same points on the vehicle in two concurrent frames, the computation might be influenced by variations in the depth in x direction of the car in front. Taking the median is however only a valid strategy, if the car is directly in front of us in the lane, and most of the points are on the back of the vehicle.
 
 ## FP.6 Performance Evaluation 2
 
-The following tables show the Lidar and camera based TTCs for the three detector / descriptor combinations, which were chosen as a result of the performance evaluation of the midterm project.
+All collected data can be found in ``performance.csv``. The following tables show the Lidar and camera based TTCs for the three detector / descriptor combinations, which were chosen as a result of the performance evaluation of the midterm project.
 
 ### FAST ORB
 |TTC Lidar [s] | TTC Camera [s] |

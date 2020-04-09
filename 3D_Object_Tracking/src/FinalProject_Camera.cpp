@@ -335,6 +335,7 @@ int main(int argc, const char* argv[]) {
             string windowName = "Final Results : TTC";
             cv::namedWindow(windowName, 4);
             cv::imshow(windowName, visImg);
+            // cout << ttcLidar << " " << ttcCamera << endl;
             cout << "Press key to continue to next frame" << endl;
             cv::waitKey(0);
           }
